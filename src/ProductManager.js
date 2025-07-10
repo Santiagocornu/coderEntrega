@@ -8,18 +8,15 @@ class ProductManager {
         ? products[products.length - 1].id + 1 
         : 1;
     }
-
-
-    async getProducts(){
-        try {
-           const  productsRaw = await fs.promises.readFile(this.pathFile,"utf-8")
-            const products=JSON.parse(productsRaw);
-            return products;
-        } catch (error) {
-            throw new Error ("no se pudieron mostrar los productos adecuadamente por:",error.message)
-        }
-    }
-
+    async getProducts() {
+  try {
+    const productsRaw = await fs.promises.readFile(this.pathFile, "utf-8");
+    const products = JSON.parse(productsRaw);
+    return products;
+  } catch (error) {
+    throw new Error("No se pudieron mostrar los productos adecuadamente: " + error.message);
+  }
+}
     async addProduct(newProduct) {
     try {if(!newProduct.title || !newProduct.price ){
         throw new Error("Faltan datos obligatiorios como name o price")

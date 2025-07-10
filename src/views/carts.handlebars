@@ -1,0 +1,20 @@
+<h1>Carritos</h1>
+
+{{#if carts.length}}
+  {{#each carts}}
+    <div style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;">
+      <h3>🛒 Carrito ID: {{this.id}}</h3>
+      {{#if this.products.length}}
+        <ul>
+          {{#each this.products}}
+            <li>🧾 Producto ID: {{this.product}} | Cantidad: {{this.quantity}}</li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <p>Carrito vacío</p>
+      {{/if}}
+    </div>
+  {{/each}}
+{{else}}
+  <p>No hay carritos creados.</p>
+{{/if}}

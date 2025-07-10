@@ -1,0 +1,41 @@
+[
+  {
+    "id": 7,
+    "title": "señor gato",
+    "description": "es un señor gato que queres que te diga",
+    "code": "no se",
+    "price": 34,
+    "status": true,
+    "stock": 222,
+    "category": "no se",
+    "thumbnails": [
+      "https://i.pinimg.com/1200x/c0/b0/d0/c0b0d01c67a785b75d70fdf72ec180e8.jpg"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "222",
+    "description": "222",
+    "code": "222",
+    "price": 222,
+    "status": true,
+    "stock": 222,
+    "category": "222",
+    "thumbnails": [
+      "https://i.pinimg.com/736x/92/f2/e4/92f2e4543a80430161528de728dfbccb.jpg"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "hola soy un titulo",
+    "description": "si asi es",
+    "code": "0YEGJI",
+    "price": 233223,
+    "status": true,
+    "stock": 222,
+    "category": "no se",
+    "thumbnails": [
+      "https://i.pinimg.com/736x/79/64/65/7964657b280dbb1e870a7ae99bdd9c30.jpg"
+    ]
+  }
+]

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #F76B15;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-logo img {
+      height: 100px;
+      width: 100px;
+      object-fit: cover;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .nav-links {
+      margin: 0 auto;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover {
+      opacity: 0.8;
+    }
+
+    @media(max-width: 600px) {
+      .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        margin: 0.5rem 0 0 0;
+        flex-wrap: wrap;
+      }
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="https://i.pinimg.com/736x/df/5f/10/df5f10192d4d6a8a2d5530b0241a291d.jpg" alt="Temu">
+      </div>
+      <div class="nav-links">
+        <a href="/">Inicio</a>
+        <a href="/realtimeproducts">Real Time</a>
+        <a href="/cartsview">Carritos</a>
+        <a href="/api/products">API Products</a>
+        <a href="/api/carts">API Carritos</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    {{{body}}}
+  </main>
+</body>
+</html>
