@@ -1,111 +1,273 @@
-<div class="dashboard">
-  <div class="product-grid">
-    {{#each products}}
-      <div class="product-card">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Productos</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #f7f7f7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .dashboard {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .dashboard-title {
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: #F76B15;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+
+    .filters select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      padding: 1rem;
+      transition: box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 6px 18px rgb(247 107 21 / 0.4);
+    }
+
+    .product-image-container {
+      width: 100%;
+      padding-top: 100%;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .product-image {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 0.5rem 0;
+      text-align: center;
+    }
+
+    .product-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #F76B15;
+      text-align: center;
+    }
+
+    #paginationControls button {
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      background-color: #F76B15;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #paginationControls span {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard">
+    <h1 class="dashboard-title">Productos</h1>
+
+    <div class="filters">
+      <select id="categoryFilter">
+        <option value="">Todas las categorías</option>
+      </select>
+
+      <select id="disponibleFilter">
+        <option value="">Disponibilidad</option>
+        <option value="true">Disponible</option>
+        <option value="false">No disponible</option>
+      </select>
+
+      <select id="sortFilter">
+        <option value="">Ordenar por precio</option>
+        <option value="asc">Menor a mayor</option>
+        <option value="desc">Mayor a menor</option>
+      </select>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <!-- Productos -->
+    </div>
+
+    <div id="paginationControls" style="text-align: center; margin-top: 2rem;"></div>
+  </div>
+
+  <script>
+  const API_URL = "http://localhost:8080/api/products";
+  let currentPage = 1;
+  const limit = 12;
+  let allProducts = []; // guardamos TODOS los productos traídos de la API
+
+  async function fetchProducts() {
+    // Traemos todos los productos sin filtros desde backend
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    allProducts = data.docs; // asumimos que backend devuelve todos los productos en docs
+
+    applyFilters(); // aplicamos filtro, orden y paginación en frontend
+  }
+
+  function applyFilters() {
+    const category = document.getElementById("categoryFilter").value;
+    const disponible = document.getElementById("disponibleFilter").value;
+    const sort = document.getElementById("sortFilter").value;
+
+    // Filtrar categoría
+    let filtered = category ? allProducts.filter(p => p.category === category) : [...allProducts];
+
+    // Filtrar disponibilidad
+    if (disponible) {
+      const isAvailable = disponible === "true";
+      filtered = filtered.filter(p => (isAvailable ? p.stock > 0 : p.stock === 0));
+    }
+
+    // Ordenar por precio
+    if (sort === "asc") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sort === "desc") {
+      filtered.sort((a, b) => b.price - a.price);
+    }
+
+    // Paginación frontend
+    const totalPages = Math.ceil(filtered.length / limit);
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+
+    const start = (currentPage - 1) * limit;
+    const paginatedProducts = filtered.slice(start, start + limit);
+
+    renderCategories(allProducts); // categorías siempre con todos los productos
+    renderProducts(paginatedProducts);
+    renderPagination(totalPages);
+  }
+
+  function renderCategories(products) {
+    const categoryFilter = document.getElementById("categoryFilter");
+    categoryFilter.innerHTML = '<option value="">Todas las categorías</option>';
+
+    const categories = [...new Set(products.map(p => p.category))];
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      categoryFilter.appendChild(option);
+    });
+
+    // No perder selección actual
+    categoryFilter.value = document.getElementById("categoryFilter").value;
+  }
+
+  function renderProducts(products) {
+    const container = document.getElementById("productGrid");
+    container.innerHTML = "";
+
+    products.forEach(product => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
         <div class="product-image-container">
-          <img class="product-image" src="{{this.thumbnails.[0]}}" alt="{{this.title}}">
+          <img class="product-image" src="${product.thumbnails?.[0] || ''}" alt="${product.title}">
         </div>
-        <h2 class="product-title">{{this.title}}</h2>
-        <h3 class="product-price">Precio: ${{this.price}}</h3>
-      </div>
-    {{/each}}
-  </div>
-
-  <div class="pagination">
-    {{#each links}}
-      <a href="{{this.link}}" class="page-link">{{this.text}}</a>
-    {{/each}}
-  </div>
-</div>
-
-
-<style>
-  .dashboard {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        <h2 class="product-title">${product.title}</h2>
+        <h3 class="product-price">Precio: $${product.price}</h3>
+      `;
+      container.appendChild(card);
+    });
   }
 
-  .dashboard-title {
-    font-weight: 700;
-    font-size: 2.5rem;
-    color: #F76B15;
-    margin-bottom: 1.5rem;
-    text-align: center;
+  function renderPagination(totalPages) {
+    const pagination = document.getElementById("paginationControls");
+    pagination.innerHTML = "";
+
+    if (currentPage > 1) {
+      const prevBtn = document.createElement("button");
+      prevBtn.textContent = "← Anterior";
+      prevBtn.onclick = () => {
+        currentPage--;
+        applyFilters();
+      };
+      pagination.appendChild(prevBtn);
+    }
+
+    const current = document.createElement("span");
+    current.textContent = ` Página ${currentPage} de ${totalPages} `;
+    pagination.appendChild(current);
+
+    if (currentPage < totalPages) {
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "Siguiente →";
+      nextBtn.onclick = () => {
+        currentPage++;
+        applyFilters();
+      };
+      pagination.appendChild(nextBtn);
+    }
   }
 
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-  }
+  // Listeners para filtros
+  document.getElementById("categoryFilter").addEventListener("change", () => {
+    currentPage = 1;
+    applyFilters();
+  });
 
-  .product-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-    padding: 1rem;
-    transition: box-shadow 0.3s ease;
-    cursor: pointer;
-  }
+  document.getElementById("disponibleFilter").addEventListener("change", () => {
+    currentPage = 1;
+    applyFilters();
+  });
 
-  .product-card:hover {
-    box-shadow: 0 6px 18px rgb(247 107 21 / 0.4);
-  }
+  document.getElementById("sortFilter").addEventListener("change", () => {
+    currentPage = 1;
+    applyFilters();
+  });
 
-  .product-image-container {
-    width: 100%;
-    padding-top: 100%;
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 1rem;
-  }
+  // Primera carga
+  fetchProducts();
+</script>
 
-  .product-image {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-  }
-
-  .product-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
-    margin: 0 0 0.5rem 0;
-    text-align: center;
-  }
-
-  .product-price {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #F76B15;
-    text-align: center;
-  }
-
-  .pagination {
-    margin-top: 2rem;
-    text-align: center;
-  }
-
-  .page-link {
-    display: inline-block;
-    margin: 0 0.25rem;
-    padding: 0.5rem 0.9rem;
-    color: #F76B15;
-    font-weight: 600;
-    text-decoration: none;
-    border: 2px solid #F76B15;
-    border-radius: 8px;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  .page-link:hover {
-    background-color: #F76B15;
-    color: white;
-  }
-</style>
+</body>
+</html>

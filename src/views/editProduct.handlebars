@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Producto</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6600;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e65c00;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px;
+      }
+    }
+  </style>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const editForm = document.getElementById("editForm");
+  const productId = editForm.dataset.productid;
+
+  if (!productId) {
+    alert("No se encontró el ID del producto. Verificá el HTML renderizado.");
+    return;
+  }
+
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const updatedProduct = {
+      title: form.title.value,
+      description: form.description.value,
+      price: form.price.valueAsNumber,
+      stock: form.stock.valueAsNumber,
+      category: form.category.value,
+      thumbnail: form.thumbnail.value,
+    };
+
+    try {
+      const response = await fetch(`/api/products/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProduct),
+      });
+
+      if (!response.ok) throw new Error("Error al actualizar el producto");
+
+      alert("Producto actualizado con éxito");
+      window.location.href = "/";
+    } catch (error) {
+      alert("Hubo un error: " + error.message + productId);
+
+    }
+  });
+});
+
+</script>
+
+</head>
+<body>
+  <div class="container">
+    <h1>Editar Producto</h1>
+
+<form id="editForm" data-productid="{{product._id}}">
+  <input type="text" name="title" value="{{product.title}}" required placeholder="Título" /><br />
+  <input type="text" name="description" value="{{product.description}}" required placeholder="Descripción" /><br />
+  <input type="number" name="price" value="{{product.price}}" required placeholder="Precio" /><br />
+  <input type="number" name="stock" value="{{product.stock}}" required placeholder="Stock" /><br />
+  <input type="text" name="category" value="{{product.category}}" required placeholder="Categoría" /><br />
+  <input type="text" name="thumbnail" value="{{product.thumbnail}}" required placeholder="URL de imagen" /><br />
+  <button type="submit">Guardar cambios</button>
+</form>
+
+
+
+</body>
+</html>
